@@ -1,5 +1,6 @@
 package pl.merito.exam.I.app00.client.server;
-
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,7 @@ import java.io.*;
 public class ServerRestController {
 
     private static List<Person> persons = new ArrayList<>();
+    private static final String FILE_PATH = "persons.txt"; 
 
     @GetMapping("/")
     public String home() {
@@ -29,17 +31,18 @@ public class ServerRestController {
         persons.add(person);
         System.out.println(String.format("Person [%s] added ", person.toString()));
         
-        savePersonToFile(person);
+        savePersonsToFile();
         
         return person;
     }
 
-    private void savePersonToFile(Person person) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("persons.txt",true))){
-            writer.write(person.toString());
-            writer.newLine();
-        }catch (IOException e){
+    private void savePersonsToFile() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
+            objectMapper.writeValue(writer, persons);  // Serialize the list as JSON and write to file
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 }
