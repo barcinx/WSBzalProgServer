@@ -16,6 +16,10 @@ public class ServerRestController {
     private static List<Person> persons = new ArrayList<>();
     private static final String FILE_PATH = "persons.txt"; 
 
+    public ServerRestController() {
+        loadPersonsFromFile();
+    }
+
     @GetMapping("/")
     public String home() {
         return "Spring is here!";
@@ -39,9 +43,19 @@ public class ServerRestController {
     private void savePersonsToFile() {
         ObjectMapper objectMapper = new ObjectMapper();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
-            objectMapper.writeValue(writer, persons);  // Serialize the list as JSON and write to file
+            objectMapper.writeValue(writer, persons);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void loadPersonsFromFile() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
+            persons = objectMapper.readValue(reader, new TypeReference<List<Person>>(){});
+        } catch (IOException e) {
+            System.out.println("No persons file found, starting with an empty list.");
+            persons = new ArrayList<>();
         }
     }
 
