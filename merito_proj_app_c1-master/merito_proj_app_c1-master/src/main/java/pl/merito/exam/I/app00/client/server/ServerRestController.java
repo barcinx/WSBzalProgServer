@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.*;
+
 @RestController
 public class ServerRestController {
 
@@ -26,6 +28,18 @@ public class ServerRestController {
     public Person addPerson(@RequestBody Person person) {
         persons.add(person);
         System.out.println(String.format("Person [%s] added ", person.toString()));
+        
+        savePersonToFile(person);
+        
         return person;
+    }
+
+    private void savePersonToFile(Person person) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("persons.txt",true))){
+            writer.write(person.toString());
+            writer.newLine();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
     }
 }
